@@ -44,4 +44,12 @@
                           outputURL:(NSURL*)outputURL
                        blockHandler:(void (^)(AVAssetExportSession *))handler;
 
+/**
+ 转换时间
+
+ @param time time
+ @return 是否是在5分钟之内
+ */
++ (BOOL)GetTimeChange:(NSDate *)time;
+
 @end

@@ -76,4 +76,27 @@
      }];
 }
 
+#pragma mark 转换时间
++ (BOOL)GetTimeChange:(NSDate *)time {
+    NSDate *currentTimeDate = [NSDate date];    //  现在时间
+    NSDate *getTimeDate = time;
+    
+    // 现在时间 与 获取时间 之差
+    long dd = (long)[currentTimeDate timeIntervalSince1970] - [getTimeDate timeIntervalSince1970];
+    
+    BOOL timeOK = NO;
+    
+    // 1小时内。。
+    if (dd/3600<1)
+    {
+        if (dd/60 <= 5) {
+            timeOK = YES;
+        }else{
+            timeOK = NO;
+        }
+    }
+    
+    return timeOK;
+}
+
 @end

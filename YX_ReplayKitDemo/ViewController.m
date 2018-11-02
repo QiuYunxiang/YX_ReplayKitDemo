@@ -218,6 +218,7 @@
     else {
         //取出这个视频
         PHFetchOptions *options = [[PHFetchOptions alloc] init];
+        options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]]; //按创建日期获取
         PHFetchResult *assetsFetchResults = [PHAsset fetchAssetsWithOptions:options];
         PHAsset *phasset = [assetsFetchResults lastObject];
         if (phasset) {
@@ -226,6 +227,13 @@
                 PHImageManager *manager = [PHImageManager defaultManager];
                 [manager requestAVAssetForVideo:phasset options:nil resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
                     AVURLAsset *urlAsset = (AVURLAsset *)asset;
+                    
+                    //此处再次判断这个视频文件的时间防止误传,以5分钟为界限
+                    if (![self videoTimeCheck:asset.creationDate.dateValue]) {
+                        [self alertWindowWithMessage:@"获取不到刚才的录屏文件，请重试，如果多次出现请更换手机" actionName:nil];
+                        return ;
+                    }
+                    
                     NSURL *videoURL = urlAsset.URL;
                     NSDate* date = [NSDate dateWithTimeIntervalSinceNow:0];
                     NSTimeInterval time = [date timeIntervalSince1970] * 1000;
@@ -280,6 +288,19 @@
     }];
     [alertVC addAction:sureAction];
     [self presentViewController:alertVC animated:YES completion:nil];
+}
+
+#pragma mark 判断取出的视频文件是不是在规定时间之内录制的
+- (BOOL)videoTimeCheck:(NSDate *)videoDate {
+    //
+    if (!videoDate) {
+        //特殊情况备注
+        return YES;
+    }
+    
+    //判断是否在5分钟之内录制
+    BOOL timeOK = [YX_ReplayManager GetTimeChange:videoDate];
+    return timeOK;
 }
 
 
